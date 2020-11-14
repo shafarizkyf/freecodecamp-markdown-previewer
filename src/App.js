@@ -1,25 +1,35 @@
-import logo from './logo.svg';
+import { useEffect, useState } from "react";
+import marked from 'marked';
+import DOMPurify from 'dompurify';
 import './App.css';
 
-function App() {
+marked.setOptions({
+  breaks: true
+});
+
+const App = () => {
+  const [input, setInput] = useState('');
+
+  useEffect(() => {
+    fetchSample();
+  }, [])
+
+  const fetchSample = async () => {
+    const response = await fetch('./markdown.txt');
+    const data = await response.text();
+    setInput(data);
+  }
+
+  const handleChange = ({target}) => {
+    setInput(target.value);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div id="app">
+      <textarea id="editor" onChange={handleChange} value={input}></textarea>
+      <div id="preview" dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(marked(input))}} />
     </div>
-  );
+  )
 }
 
 export default App;
